@@ -39,7 +39,11 @@ func main() {
 	for _, item := range resp.Contents {
 		// Delte files that were last updated more than TARGET_TIME
 		if time.Now().After(item.LastModified.Add(targetTime)) {
-			svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(bucket), Key: item.Key})
+			if _, err := svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(bucket), Key: item.Key}); err != nil {
+				log.Println(err)
+				continue
+			}
+			log.Printf("%s was deleted\n", *item.Key)
 		}
 	}
 }
